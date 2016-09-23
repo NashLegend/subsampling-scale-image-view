@@ -1431,6 +1431,7 @@ public class SubsamplingScaleImageView extends View {
                     Point dimensions = decoder.init(context, source);
                     int sWidth = dimensions.x;
                     int sHeight = dimensions.y;
+                    //noinspection WrongThread
                     int exifOrientation = view.getExifOrientation(sourceUri);
                     if (view.sRegion != null) {
                         sWidth = view.sRegion.width();
@@ -1512,6 +1513,7 @@ public class SubsamplingScaleImageView extends View {
                 if (decoder != null && tile != null && view != null && decoder.isReady() && tile.visible) {
                     synchronized (view.decoderLock) {
                         // Update tile's file sRect according to rotation
+                        //noinspection WrongThread
                         view.fileSRect(tile.sRect, tile.fileSRect);
                         if (view.sRegion != null) {
                             tile.fileSRect.offset(view.sRegion.left, view.sRegion.top);
@@ -1596,6 +1598,7 @@ public class SubsamplingScaleImageView extends View {
                 SubsamplingScaleImageView subsamplingScaleImageView = viewRef.get();
                 if (context != null && decoderFactory != null && subsamplingScaleImageView != null) {
                     bitmap = decoderFactory.make().decode(context, source);
+                    //noinspection WrongThread
                     return subsamplingScaleImageView.getExifOrientation(sourceUri);
                 }
             } catch (Exception e) {
@@ -1797,7 +1800,7 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * By default the View automatically calculates the optimal tile size. Set this to override this, and force an upper limit to the dimensions of the generated tiles. Passing {@link TILE_SIZE_AUTO} will re-enable the default behaviour.
+     * By default the View automatically calculates the optimal tile size. Set this to override this, and force an upper limit to the dimensions of the generated tiles. Passing {@link Tile#TILE_SIZE_AUTO} will re-enable the default behaviour.
      *
      * @param maxPixels
      */
@@ -1807,10 +1810,10 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * By default the View automatically calculates the optimal tile size. Set this to override this, and force an upper limit to the dimensions of the generated tiles. Passing {@link TILE_SIZE_AUTO} will re-enable the default behaviour.
+     * By default the View automatically calculates the optimal tile size. Set this to override this, and force an upper limit to the dimensions of the generated tiles. Passing {@link Tile#TILE_SIZE_AUTO} will re-enable the default behaviour.
      *
      * @param maxPixelsX
-     * @param maxPixelsU
+     * @param maxPixelsY
      */
     public void setMaxTileSize(int maxPixelsX, int maxPixelsY) {
         this.maxTileWidth = maxPixelsX;
