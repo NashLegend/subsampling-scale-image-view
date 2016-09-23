@@ -36,6 +36,7 @@ public class ImageDisplayRegionFragment extends Fragment {
         View rootView = inflater.inflate(layout.imagedisplay_region_fragment, container, false);
         final SubsamplingScaleImageView imageView = (SubsamplingScaleImageView)rootView.findViewById(id.imageView);
         imageView.setOrientation(SubsamplingScaleImageView.ORIENTATION_90);
+        imageView.setMaxTileSize(360,360);
         imageView.setImage(ImageSource.asset("card.png").region(new Rect(0, 0, 3778, 2834)));
         rootView.findViewById(id.previous).setOnClickListener(new OnClickListener() {
             @Override

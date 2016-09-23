@@ -297,11 +297,16 @@ public class SubsamplingScaleImageView extends View {
 
     //The logical density of the display
     private float density;
-
+    private float averageDpi;
+    private float targetDensity = 0;
 
     public SubsamplingScaleImageView(Context context, AttributeSet attr) {
         super(context, attr);
         density = getResources().getDisplayMetrics().density;
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        averageDpi = (metrics.xdpi + metrics.ydpi) / 2;
+        targetDensity = averageDpi;
+
         setMinimumDpi(160);
         setDoubleTapZoomDpi(160);
         setGestureDetector(context);
@@ -1178,9 +1183,9 @@ public class SubsamplingScaleImageView extends View {
         // Load double resolution - next level will be split into four tiles and at the center all four are required,
         // so don't bother with tiling until the next level 16 tiles are needed.
         fullImageSampleSize = calculateInSampleSize(satTemp.scale);
-        if (fullImageSampleSize > 1) {
-            fullImageSampleSize /= 2;
-        }
+//        if (fullImageSampleSize > 1) {
+//            fullImageSampleSize /= 2;
+//        }
 
         if (fullImageSampleSize == 1 && sRegion == null && sWidth() < maxTileDimensions.x && sHeight() < maxTileDimensions.y) {
 
@@ -1294,8 +1299,6 @@ public class SubsamplingScaleImageView extends View {
      */
     private int calculateInSampleSize(float scale) {
         if (minimumTileDpi > 0) {
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            float averageDpi = (metrics.xdpi + metrics.ydpi) / 2;
             scale = (minimumTileDpi / averageDpi) * scale;
         }
 
@@ -1318,11 +1321,15 @@ public class SubsamplingScaleImageView extends View {
             // a final image with both dimensions larger than or equal to the
             // requested height and width.
             inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+            if (targetDensity > density) {
+                targetDensity = density;
+            }
+            inSampleSize *= density / targetDensity;
         }
 
         // We want the actual sample size that will be used, so round down to nearest power of 2.
         int power = 1;
-        while (power * 2 < inSampleSize) {
+        while (power * 2 < inSampleSize * 1.33) {
             power = power * 2;
         }
 
@@ -2301,8 +2308,6 @@ public class SubsamplingScaleImageView extends View {
      * @param dpi Source image pixel density at maximum zoom.
      */
     public final void setMinimumDpi(int dpi) {
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        float averageDpi = (metrics.xdpi + metrics.ydpi) / 2;
         setMaxScale(averageDpi / dpi);
     }
 
@@ -2313,9 +2318,19 @@ public class SubsamplingScaleImageView extends View {
      * @param dpi Source image pixel density at minimum zoom.
      */
     public final void setMaximumDpi(int dpi) {
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        float averageDpi = (metrics.xdpi + metrics.ydpi) / 2;
         setMinScale(averageDpi / dpi);
+    }
+
+    /**
+     * 设置显示时的密度,可以节省内存
+     *
+     * @param targetDensity
+     */
+    public final void setTargetDensity(float targetDensity) {
+        if (targetDensity > this.density) {
+            targetDensity = this.density;
+        }
+        this.targetDensity = targetDensity;
     }
 
     /**
@@ -2342,8 +2357,6 @@ public class SubsamplingScaleImageView extends View {
      * @param minimumTileDpi Tile loading threshold.
      */
     public void setMinimumTileDpi(int minimumTileDpi) {
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        float averageDpi = (metrics.xdpi + metrics.ydpi) / 2;
         this.minimumTileDpi = (int) Math.min(averageDpi, minimumTileDpi);
         if (isReady()) {
             reset(false);
@@ -2559,8 +2572,6 @@ public class SubsamplingScaleImageView extends View {
      * @param dpi New value for double tap gesture zoom scale.
      */
     public final void setDoubleTapZoomDpi(int dpi) {
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        float averageDpi = (metrics.xdpi + metrics.ydpi) / 2;
         setDoubleTapZoomScale(averageDpi / dpi);
     }
 

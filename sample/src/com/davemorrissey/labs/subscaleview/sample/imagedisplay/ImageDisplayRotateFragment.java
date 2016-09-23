@@ -36,6 +36,7 @@ public class ImageDisplayRotateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(layout.imagedisplay_rotate_fragment, container, false);
         final SubsamplingScaleImageView imageView = (SubsamplingScaleImageView)rootView.findViewById(id.imageView);
+        imageView.setMaxTileSize(360,360);
         imageView.setImage(ImageSource.asset("squirrel.jpg"));
         imageView.setOrientation(90);
         rootView.findViewById(id.previous).setOnClickListener(new OnClickListener() {
